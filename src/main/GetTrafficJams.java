@@ -1,7 +1,9 @@
 package main;
 import java.net.URL;
+import java.util.ArrayList;
 
 import model.parser.URL_Parser;
+import model.string.EinsLiveConverter;
 
 public class GetTrafficJams {
 	public static void main(String[] args) {
@@ -12,7 +14,17 @@ public class GetTrafficJams {
 			String START_TAG = "<!-- includes/stauschau start -->";
 			URL_Parser einsLive = new URL_Parser();
 			einsLive.startConnection(einsLiveURL,START_TAG);
-			einsLive.toString();
+			//einsLive.toString();
+			EinsLiveConverter e = new EinsLiveConverter(einsLive.getStreetsInfo());
+			ArrayList<String> s = e.getSortedStreets();
+			for (int i = 0; i < s.size(); i++) {
+				System.out.println(s.get(i));
+				
+			}
+			//int index = streetInfo.length;
+			//MotorwayObject[] mo = new MotorwayObject(streetInfo);
+			
+			
 		} catch (Exception e) {
 
 		}

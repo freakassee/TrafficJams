@@ -10,8 +10,12 @@ import java.util.ArrayList;
 import model.string.StringManipulation;
 
 public class URL_Parser {
-	private ArrayList<String[]> streetsInfo = new ArrayList<String[]>();
+	private String[] test;
+	private String[]  streetsInfo;
 	
+	
+
+
 	public void startConnection(URL connectionURL,String contentTag) throws Exception {
 		// Set URL
 		URLConnection spoof = connectionURL.openConnection();
@@ -30,8 +34,15 @@ public class URL_Parser {
 				//System.out.println(shortStrLine);
 
 				String cleanedLine = StringManipulation.deleteIntervalString(shortStrLine,"<",">");
-				streetsInfo.add(cleanedLine.split(",")); 
+				/*String[]*/  streetsInfo = cleanedLine.split(",");
+		
+				
+//				for (int i = 0; i < streetsInfo.length; i++) {
+//					streetsInfo.add(streetsInfo[i].split(";"));
+//				}
+				//streetsInfo.add(cleanedLine.split(",")); 
 				//System.out.println(cleanedLine);
+		
 				System.out.println("");
 				
 // 				shortStrLine.contains("<strong class=\"name\">");
@@ -48,18 +59,38 @@ public class URL_Parser {
 			}
 		}
 		
-		System.out.println(streetsInfo.get(0)[0]);
+		//System.out.println(streetsInfo.get(0)[0]);
 		
 	}
+
 	
 	
 	public String toString(){
-		for (int j = 0; j < streetsInfo.size(); j++) {
-			for (int i = 0; i < streetsInfo.get(j).length; i++) {
-				 System.out.println(streetsInfo.get(j)[i]);
-			}
+		for (int j = 0; j < streetsInfo.length; j++) {
+			System.out.println(streetsInfo[j]);
+			
 		}
 		return "";
+	}
+
+
+
+
+	/**
+	 * @return the streetsInfo
+	 */
+	public String[] getStreetsInfo() {
+		return streetsInfo;
+	}
+
+
+
+
+	/**
+	 * @param streetsInfo the streetsInfo to set
+	 */
+	public void setStreetsInfo(String[] streetsInfo) {
+		this.streetsInfo = streetsInfo;
 	}
 			
 
