@@ -1,12 +1,11 @@
-package test_PostgreSQL_JDBC;
+package test.PostgreSQL_JDBC;
 
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.ResultSet;
 import java.sql.Statement;
 
-public class _05Update_traffic {
-
+public class _06Delete_traffic {
 	public static void main(String args[]) {
 		Connection c = null;
 		Statement stmt = null;
@@ -17,7 +16,7 @@ public class _05Update_traffic {
 			System.out.println("Opened database successfully");
 
 			stmt = c.createStatement();
-			String sql = "UPDATE TRAFFIC set SALARY = 25000.00 where ID=1;";
+			String sql = "DELETE from COMPANY where ID=2;";
 			stmt.executeUpdate(sql);
 			c.commit();
 
@@ -43,6 +42,5 @@ public class _05Update_traffic {
 			System.exit(0);
 		}
 		System.out.println("Operation done successfully");
-
 	}
 }

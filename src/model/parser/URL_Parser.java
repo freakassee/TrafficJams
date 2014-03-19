@@ -10,13 +10,13 @@ import java.util.ArrayList;
 import model.string.StringManipulation;
 
 public class URL_Parser {
-	private String[] test;
+	private String test;
 	private String[]  streetsInfo;
 	
 	
 
 
-	public void startConnection(URL connectionURL,String contentTag) throws Exception {
+	public void startConnection(URL connectionURL,String contentStartTag,String contentEndTag) throws Exception {
 		// Set URL
 		URLConnection spoof = connectionURL.openConnection();
 		// Spoof the connection so we look like a web browser
@@ -26,10 +26,12 @@ public class URL_Parser {
 		String strLine = "";
 		// Loop through every line in the source
 		while ((strLine = in.readLine()) != null) {
-			if (strLine.contains(contentTag)) {
+			if (strLine.contains(contentStartTag)) {
+				
+				
 				//complete line
 				//System.out.println(strLine);
-				String shortStrLine = strLine.substring(strLine.indexOf(contentTag));
+				String shortStrLine = strLine.substring(strLine.indexOf(contentStartTag));
 				//shortend line
 				//System.out.println(shortStrLine);
 

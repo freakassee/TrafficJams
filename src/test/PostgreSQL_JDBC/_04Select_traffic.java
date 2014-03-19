@@ -1,4 +1,4 @@
-package test_PostgreSQL_JDBC;
+package test.PostgreSQL_JDBC;
 
 import java.sql.Connection;
 import java.sql.DriverManager;
