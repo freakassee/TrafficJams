@@ -32,7 +32,7 @@ public class ReadDocFromURL {
 	private void startConnection(URL connectionURL) throws IOException {
 		URLConnection spoof;
 		spoof = connectionURL.openConnection();
-		BufferedReader in = new BufferedReader(new InputStreamReader(spoof.getInputStream()));
+		BufferedReader in = new BufferedReader(new InputStreamReader(spoof.getInputStream(),"UTF-8"));
 		String strLine = "";
 		while ((strLine = in.readLine()) != null) {
 			if (!strLine.trim().equals("")) {

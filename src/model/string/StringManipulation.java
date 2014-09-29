@@ -9,7 +9,9 @@ public class StringManipulation {
 		if (!inputString.contains(intervalStartChar) && !inputString.contains(intervalEndChar)) {
 			
 			inputString = deleteCharacters(deleteCharacters(inputString, ",,"),"  ");
-			return inputString;
+			return inputString.replaceFirst(",","");
+			//War vorher: aufpassen, dass nicht zuviele kommas entfernt werden
+			//return inputString;
 		}
 		String temp = "";
 		if (inputString.contains(intervalStartChar)) {

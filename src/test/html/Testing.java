@@ -10,7 +10,6 @@ public class Testing {
 	public static void main(String[] args) {
 		try {
 			URL wrdURL = new URL("http://www.wdr.de/verkehrslage/nordrhein-westfalen");
-			URL einsLive = new URL("http://www.einslive.de/magazin/nachrichten/stauschau/index.jsp");
 			ReadDocFromURL wdr = new ReadDocFromURL(wrdURL);
 			// ReadDocFromURL einslive = new ReadDocFromURL(einsLive);
 
