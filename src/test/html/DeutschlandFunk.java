@@ -4,6 +4,7 @@ import java.net.URL;
 import java.util.ArrayList;
 
 import model.parser.ReadDocFromURL;
+import model.string.DLF_Converter;
 import model.string.DLF_HTML_Cleaner;
 import model.string.WDR_StringShorter;
 

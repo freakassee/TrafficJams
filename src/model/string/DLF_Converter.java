@@ -1,4 +1,4 @@
-package test.html;
+package model.string;
 
 import java.util.ArrayList;
 
