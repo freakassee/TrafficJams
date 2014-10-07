@@ -10,8 +10,8 @@ public class StringManipulation {
 			
 			inputString = deleteCharacters(deleteCharacters(inputString, ",,"),"  ");
 			return inputString.replaceFirst(",","");
-			//War vorher: aufpassen, dass nicht zuviele kommas entfernt werden
-			//return inputString;
+			//aufpassen, dass nicht zuviele kommas entfernt werden
+			//War vorher: return inputString;
 		}
 		String temp = "";
 		if (inputString.contains(intervalStartChar)) {

@@ -67,13 +67,23 @@ public class DLF_HTML_Cleaner {
 			item = StringManipulation.deleteIntervalString(item, "<", ">");
 
 			item = StringManipulation.deleteCharacters(item, ",");
-			if (item.startsWith("Auf der")) {
-				item = item.replaceFirst("Auf der", "");
+			
+			if (item.startsWith("Auf der ")) {
+				item = item.replaceFirst("Auf der ", "");
 			}
-			itemList.set(i, item.trim());
+			if (item.startsWith("Die ")) {
+				item = item.replaceFirst("Die ", "");
+			}
+			
+			item.trim();
+			//Überprüfung, ob Nachricht mit Autobahn- (z.b. A1) bzw. Bundesstraßenkennung (B51) beginnt
+			if(!(item.startsWith("A")||item.startsWith("B"))){
+				System.err.println("Error at Item # "+ i + ": " +item);
+			}
+			itemList.set(i, item);
 
+			//System.out.println(item);
 		}
-		//System.out.println(itemList);
 
 	}
 
