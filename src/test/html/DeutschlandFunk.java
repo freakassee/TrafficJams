@@ -11,7 +11,7 @@ import model.string.WDR_StringShorter;
 public class DeutschlandFunk {
 	public static void main(String[] args) {
 		try {
-			URL dlf_url = new URL("http://localhost:8080/examples/dlf.htm");
+			URL dlf_url = new URL("http://localhost:8080/examples/dlf2.htm");
 		
 			ReadDocFromURL dlf_doc = new ReadDocFromURL(dlf_url);
 			

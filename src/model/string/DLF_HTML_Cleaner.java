@@ -36,7 +36,7 @@ public class DLF_HTML_Cleaner {
 			}
 
 			cleanItemList();
-			
+
 		}
 	}
 
@@ -67,22 +67,29 @@ public class DLF_HTML_Cleaner {
 			item = StringManipulation.deleteIntervalString(item, "<", ">");
 
 			item = StringManipulation.deleteCharacters(item, ",");
-			
+
 			if (item.startsWith("Auf der ")) {
 				item = item.replaceFirst("Auf der ", "");
 			}
 			if (item.startsWith("Die ")) {
 				item = item.replaceFirst("Die ", "");
 			}
-			
+			if (item.contains("- ")) {
+				item = item.replace("- ", "Richtung ");
+			}
+			if (item.contains("ist zwischen ")) {
+				item = item.replace("ist zwischen ", "zwischen ");
+			}
+
 			item.trim();
-			//Überprüfung, ob Nachricht mit Autobahn- (z.b. A1) bzw. Bundesstraßenkennung (B51) beginnt
-			if(!(item.startsWith("A")||item.startsWith("B"))){
-				System.err.println("Error at Item # "+ i + ": " +item);
+			// Überprüfung, ob Nachricht mit Autobahn- (z.b. A1) bzw.
+			// Bundesstraßenkennung (B51) beginnt
+			if (!(item.startsWith("A") || item.startsWith("B"))) {
+				System.err.println("Error at Item # " + i + ": " + item);
 			}
 			itemList.set(i, item);
 
-			//System.out.println(item);
+			// System.out.println(item);
 		}
 
 	}
