@@ -80,7 +80,9 @@ public class DLF_HTML_Cleaner {
 			if (item.contains("ist zwischen ")) {
 				item = item.replace("ist zwischen ", "zwischen ");
 			}
-
+			if (item.contains("Zwischen ")) {
+				item = item.replace("Zwischen ", "zwischen ");
+			}
 			item.trim();
 			// Überprüfung, ob Nachricht mit Autobahn- (z.b. A1) bzw.
 			// Bundesstraßenkennung (B51) beginnt

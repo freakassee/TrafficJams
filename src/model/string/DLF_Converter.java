@@ -6,17 +6,15 @@ public class DLF_Converter {
 
 	protected String motorway, dirFrom, dirTo, locStart, locEnd, type, flow, descr, trafficJam;
 	protected int length;
+	protected ArrayList<String> unsortedTrafficJams = new ArrayList<String>();
 	protected String r = "Richtung";
 	protected String z = "zwischen";
 	protected String[] startWithAbzweig = { "Abzweig" };
-	protected String []  wordsBefore = {"Kreuz","Bad","Dreieck","Flughafen","Tunnel","Groß","Westkreuz","Rastplatz","Raststätte am", "Inning",};
-	protected String[] wordsAfter = {"Brücke","Ost","Nord","Süd","West","Kreuz","(Harz)","Ammersee","Pfaffenstein","Hockenheimring","Ei"}; 
+	protected String[] wordsBefore = { "Kreuz", "Bad", "Dreieck", "Flughafen", "Groß", "Westkreuz", "Rastplatz", "Raststätte am" };
+	protected String[] wordsAfter = { "Brücke", "Ost", "Nord", "Süd", "West", "Kreuz", "(Harz)", "a. Ammersee", "Hockenheimring", "Ei" };
 
 	public DLF_Converter(ArrayList<String> trafficJamList) {
 		for (int i = 0; i < trafficJamList.size(); i++) {
-
-			boolean containsDirection=false;
-			boolean containsLocations=false;
 			motorway = "";
 			dirFrom = "";
 			dirTo = "";
@@ -25,120 +23,105 @@ public class DLF_Converter {
 			type = "";
 			flow = "";
 			descr = "";
+
 			trafficJam = trafficJamList.get(i);
+//error!
+			int indexOfRichtung = getIndexOfWord(r);
+			int indexOfZwischen = getIndexOfWord(z);
 
-			//int numberOfWords = getNumberOfWords();
-			
-			
-			
-			// // if(i==81){
-			// // System.out.println();
-			// // }
-			
-			
-			motorway = shortString(" ");
-			
-			if (trafficJam.contains(r)||getIndexOfWord(r)<5&&getIndexOfWord(r)>0) {
-				containsDirection = true;
-				
-			}
-			defineDirections(containsDirection);
+			if (trafficJam.contains(r) && trafficJam.contains(z) && indexOfRichtung > 0 && indexOfRichtung < 4 && indexOfZwischen > 0 && indexOfZwischen < 6) {
 
-			
-			
-			if (trafficJam.contains(z)||getIndexOfWord(z)<3&&getIndexOfWord(z)>0) {
-				containsLocations = true;
-				
+				motorway = shortString(" ");
+
+				defineDirections();
+				defineLocations();
+
+			} else {
+				unsortedTrafficJams.add(trafficJam);
 			}
-			
-			defineLocations(containsLocations);
-			
 
 		}
+
+		System.out.println();
 	}
 
-	private int getNumberOfWords() {
+	protected int getNumberOfWords() {
 		String tmp = trafficJam;
 		int index = 1;
-		//
+
 		while (trafficJam.contains(" ")) {
 			index++;
 			shortString(" ");
 		}
-		
+
 		trafficJam = tmp;
 		return index;
 	}
 
-	private int getIndexOfWord(String word) {
+	protected int getIndexOfWord(String word) {
 		String tmp = trafficJam;
 		int index = 0;
-		//
+
 		while (trafficJam.contains(word)) {
 			index++;
-			shortString(" ");
+
+			String tmpword = shortString(" ");
+			if (tmpword.equalsIgnoreCase(word)) {
+				break;
+			}
 		}
+
 		trafficJam = tmp;
 		return index;
 	}
 
-	private void defineDirections(boolean bothDirections) {
-		if(bothDirections){
-			dirFrom= shortString(r);
-			shortString(" ");
-			//beachte, hier muss noch mehr logik hin, wenn dirTo mehr als nur aus einem Wort bestimmt,
-			//whitelist?
-			dirTo = shortString(" ");
-		}else{
-			dirFrom= shortString(" ");
-			dirTo = dirFrom;
-		}
-		
+	private void defineDirections() {
+
+		dirFrom = shortString(r);
+
+		dirTo = shortString(z);
+
 	}
-	/*
-	 * 
-	 * anpassen, derzeit noch falsch!
-	 */
-	private void defineLocations(boolean containsLocations) {
-		if(containsLocations){
-			//killing "zwischen"
-			//shortString("zwischen");
-			shortString(" ");
-			locStart= shortString("und ");
-			//killing "und"
-			shortString(" ");
-			//beachte, hier muss noch mehr logik hin, wenn mehr als nur ein word vorhanden ist,
-			//whitelist?
-			if(doesSentenceStartWithWords(wordsBefore)){
-				locEnd = shortString(" ") + " ";	
-				}
+
+	private void defineLocations() {
+
+		locStart = shortString("und");
+		int wordIndexOfBefore = doesSentenceStartWithWords(wordsBefore);
+		
+		
+		if(trafficJam.startsWith("Tunnel")){
 			
-			locEnd = locEnd + shortString(" ");
-			if(doesSentenceStartWithWords(wordsAfter)){
-			locEnd = locEnd + " " +shortString(" ");	
-			}
-			System.out.println(motorway + " "+dirFrom+ "Richtung: "+ dirTo +" zwischen: "+ locStart +" und: "+ locEnd);
-		
-		}else{
-			//System.out.println("Logik überlegen. Needs to be done");
+			locEnd = shortString("Tunnel")+ shortString(" ") + shortString(" ");
 		}
 		
+		if (wordIndexOfBefore >= 0) {
+
+			locEnd = shortString(wordsBefore[wordIndexOfBefore]);
+		}
+		int wordIndexOfAfter = doesSentenceStartWithWords(wordsAfter);
+		locEnd = locEnd + shortString(" ");
+		if (wordIndexOfAfter >= 0) {
+			locEnd = shortString(wordsBefore[wordIndexOfAfter]);
+		}
+		System.out.println(motorway + " " + dirFrom + "Richtung: " + dirTo + " zwischen: " + locStart + "und: " + locEnd);
+
 	}
 
-	private boolean doesSentenceStartWithWords(String[] words) {
+	protected int doesSentenceStartWithWords(String[] words) {
+		int index = -1;
 		for (int i = 0; i < words.length; i++) {
-
 			if (trafficJam.startsWith(words[i])) {
-return true;
+				return i;
 			}
 
 		}
-		return false;
+		return index;
 	}
 
 	protected String shortString(String charSequenceToSearchFor) {
 		String extractedString = trafficJam.substring(0, trafficJam.indexOf(charSequenceToSearchFor));
-		trafficJam = trafficJam.substring(trafficJam.indexOf(charSequenceToSearchFor)).trim();
+		trafficJam = trafficJam.substring(trafficJam.indexOf(charSequenceToSearchFor));
+		trafficJam = trafficJam.replaceFirst(charSequenceToSearchFor, "").trim();
 		return extractedString;
 
 	}
