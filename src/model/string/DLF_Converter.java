@@ -10,8 +10,8 @@ public class DLF_Converter {
 	protected String r = "Richtung";
 	protected String z = "zwischen";
 	protected String[] startWithAbzweig = { "Abzweig" };
-	protected String[] wordsBefore = { "Kreuz", "Bad", "Dreieck", "Flughafen", "Groß", "Westkreuz", "Rastplatz", "Raststätte am" };
-	protected String[] wordsAfter = { "Brücke", "Ost", "Nord", "Süd", "West", "Kreuz", "(Harz)", "a. Ammersee", "Hockenheimring", "Ei" };
+	protected String[] wordsBefore = { "Kreuz ", "Bad ", "Dreieck ", "Flughafen ", "Groß ", "Westkreuz ", "Rastplatz ", "Raststätte am " ,"Grenzübergang ","Hann. "};
+	protected String[] wordsAfter = { "Brücke ", "Ost ", "Nord ", "Süd ", "West ", "Kreuz ", "(Harz) ", "a. Ammersee ", "Hockenheimring ", "Ei " };
 
 	public DLF_Converter(ArrayList<String> trafficJamList) {
 		for (int i = 0; i < trafficJamList.size(); i++) {
@@ -23,9 +23,10 @@ public class DLF_Converter {
 			type = "";
 			flow = "";
 			descr = "";
+			length=0;
 
 			trafficJam = trafficJamList.get(i);
-//error!
+			
 			int indexOfRichtung = getIndexOfWord(r);
 			int indexOfZwischen = getIndexOfWord(z);
 
@@ -33,8 +34,22 @@ public class DLF_Converter {
 
 				motorway = shortString(" ");
 
+//				if (motorway.equals("A93")) {
+//					System.out.println();
+//
+//				}
 				defineDirections();
 				defineLocations();
+				if (trafficJam.contains(" km ")) {
+				
+					int indexOfLength = getIndexOfWord(" km ");
+					String[] splittedTrafficJams = trafficJam.split(" ");
+					length = Integer.valueOf(splittedTrafficJams[indexOfLength-1]);
+										
+					
+	System.out.println(length);
+					
+				}
 
 			} else {
 				unsortedTrafficJams.add(trafficJam);
@@ -85,25 +100,28 @@ public class DLF_Converter {
 
 	private void defineLocations() {
 
-		locStart = shortString("und");
+		locStart = shortString("und ");
 		int wordIndexOfBefore = doesSentenceStartWithWords(wordsBefore);
-		
-		
-		if(trafficJam.startsWith("Tunnel")){
-			
-			locEnd = shortString("Tunnel")+ shortString(" ") + shortString(" ");
-		}
-		
-		if (wordIndexOfBefore >= 0) {
 
-			locEnd = shortString(wordsBefore[wordIndexOfBefore]);
+		if (trafficJam.startsWith("Tunnel")) {
+
+			locEnd = shortString("Tunnel") + "Tunnel " + shortString(" ") + " " + shortString(" ");
+		} else {
+			if (wordIndexOfBefore >= 0) {
+				locEnd = wordsBefore[wordIndexOfBefore];
+				shortString(wordsBefore[wordIndexOfBefore]);
+			}
+			locEnd = locEnd + shortString(" ");
+			int wordIndexOfAfter = doesSentenceStartWithWords(wordsAfter);
+
+			if (wordIndexOfAfter >= 0) {
+				locEnd = locEnd + " " + wordsAfter[wordIndexOfAfter];
+				shortString(wordsAfter[wordIndexOfAfter]);
+			}
 		}
-		int wordIndexOfAfter = doesSentenceStartWithWords(wordsAfter);
-		locEnd = locEnd + shortString(" ");
-		if (wordIndexOfAfter >= 0) {
-			locEnd = shortString(wordsBefore[wordIndexOfAfter]);
-		}
-		System.out.println(motorway + " " + dirFrom + "Richtung: " + dirTo + " zwischen: " + locStart + "und: " + locEnd);
+		System.out.println(motorway + " " + dirFrom + " " + dirTo + " " + locStart + " " + locEnd);
+
+//		System.out.println(motorway + " " + dirFrom + " Richtung: " + dirTo + " zwischen: " + locStart + " und: " + locEnd);
 
 	}
 
@@ -122,7 +140,7 @@ public class DLF_Converter {
 		String extractedString = trafficJam.substring(0, trafficJam.indexOf(charSequenceToSearchFor));
 		trafficJam = trafficJam.substring(trafficJam.indexOf(charSequenceToSearchFor));
 		trafficJam = trafficJam.replaceFirst(charSequenceToSearchFor, "").trim();
-		return extractedString;
+		return extractedString.trim();
 
 	}
 
