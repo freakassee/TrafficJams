@@ -83,6 +83,14 @@ public class DLF_HTML_Cleaner {
 			if (item.contains("Zwischen ")) {
 				item = item.replace("Zwischen ", "zwischen ");
 			}
+			if(item.contains("St.")){
+				item = item.replaceFirst("St.", "Sankt");
+			}
+			if(item.contains("Rhld")){
+				item = item.replaceFirst("Rhld", "Rheinland");
+			}
+			
+			
 			item.trim();
 			// Überprüfung, ob Nachricht mit Autobahn- (z.b. A1) bzw.
 			// Bundesstraßenkennung (B51) beginnt

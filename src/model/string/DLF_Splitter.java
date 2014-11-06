@@ -11,51 +11,32 @@ public class DLF_Splitter {
 	protected ArrayList<String> unsortedTrafficJams = new ArrayList<String>();
 	protected String r = "Richtung";
 	protected String z = "zwischen";
-	protected ArrayList<String> zusaetze = new ArrayList<String>(
-			Arrays.asList("Bad", "Ostumfahrung", "Westumfahrung", "Nordumfahrung", "Südumfahrung",
-					"Heilbad","Hessisch","Hohen","Horn-Bad","Königs","Märkisch"));
-	//http://de.wikipedia.org/wiki/Liste_der_St%C3%A4dte_in_Deutschland
-	protected ArrayList<String> notUsedYet = new ArrayList<String>(Arrays.asList("Elbe", "Leine",
-			"Lumda", "Saale", "Westerwald", "Hansestadt", "Altmark", "Harz", "Eder", "Unterweser", 
-			"Oder",	"Rügen", "Bergisch", "Odenwald","Anhalt","Donau","Pfalz","Lutherstadt",
-			"Jagst","Lausitz","Unstrut","Wohra","Ostsee","Westf.","Schwaben","Ems","Bergstraße",
-			"Werre","Elster","Neckar","Sieg","Efze","Ohm","Milde","Kyffhäuser","Taunus","Allgäu",
-			"Hunsrück","Anhalt","Rheinland","Baden","Ostfriesland","Bodensee","Mark","Oldenburg",
-			"Spreewald","Wendland","Sauerland","Geiseltal","Veit","Dosse","Wald","Oldb","Bode",
-			""
-			
-			));
+	protected ArrayList<String> zusaetze = new ArrayList<String>(Arrays.asList("Bad", "Sankt", "Schwäbisch", "Ostumfahrung", "Westumfahrung", "Nordumfahrung", "Südumfahrung", "Heilbad", "Hessisch",
+			"Hohen", "Horn-Bad", "Königs", "Märkisch", "Preußisch", "Schloß", "Südliches"));
+	// http://de.wikipedia.org/wiki/Liste_der_St%C3%A4dte_in_Deutschland
+	protected ArrayList<String> notUsedYet = new ArrayList<String>(Arrays.asList("Elbe", "Leine", "Lumda", "Saale", "Westerwald", "Hansestadt", "Altmark", "Harz", "Eder", "Unterweser", "Oder",
+			"Rügen", "Bergisch", "Odenwald", "Anhalt", "Donau", "Pfalz", "Lutherstadt", "Jagst", "Lausitz", "Unstrut", "Wohra", "Ostsee", "Westf.", "Schwaben", "Ems", "Bergstraße", "Werre", "Elster",
+			"Neckar", "Sieg", "Efze", "Ohm", "Milde", "Kyffhäuser", "Taunus", "Allgäu", "Hunsrück", "Anhalt", "Rheinland", "Baden", "Ostfriesland", "Bodensee", "Mark", "Oldenburg", "Spreewald",
+			"Wendland", "Sauerland", "Geiseltal", "Veit", "Dosse", "Wald", "Oldb", "Bode", "Westfalica", "Wetterau", "Holstein", "Aller", "Wümme", "a.d.Laaber", "Hohentwiel", "Eifel", "Uckermark",
+			"Rhön", "Niederrhein", "Müritz", "Havel", "Westfalen", "Ei"));
 
-	protected ArrayList<String> notUsedYet2 = new ArrayList<String>(Arrays.asList("am Trifels", 
-			"bei Nürnberg", "im Fichtelgebirge", "in der Oberpfalz", 
-			"vor der Höhe", "im Harz", "am Deister",
-			"an der Saale", "am Taunus", "auf Rügen", "bei Berlin", 
-			"a. d. Eigen", "an der Riß", "am Rhein", "an der Rhön", 
-			"im Schwarzwald", "an der Havel", "Freie Hansestadt",
-			"in der Nordheide","Märkische Schweiz",
-			"an der Altmühl", "an der Donau","am Teutoburger Wald",
-			"am Kaiserstuhl","am Main","am Neckar","im Breisgau",
-			"bei München","an der Steige","an der Brenz","an der Fils",
-			"im Kinzigtal","am Harz","an der Aisch","in Unterfranken",
-			"an der Eger","im Allgäu","an der Jagst","unter Teck",
-			"in Bayern","am Elm","im Taunus","Sächsische Schweiz",
-			"am See","an der Isar","in der Pfalz","am Lech","an der Unstrut",
-			"an der Pegnitz","an der Lahn", "am Inn","an der Ruhr",
-			"am Kocher","am Rennweg","am Waldnaab","am Kulm","am Rübenberge",
-			"an der Orla","an der Weinstraße","bei Coburg", "in Holstein","in Sachsen",
-			"am Brocken","vor der Rhön"
-			
-			
-			
-			));
-	
-	// O fertig, 
+	protected ArrayList<String> notUsedYet2 = new ArrayList<String>(Arrays.asList("am Trifels", "bei Nürnberg", "im Fichtelgebirge", "in der Oberpfalz", "vor der Höhe", "im Harz", "am Deister",
+			"an der Saale", "am Taunus", "auf Rügen", "bei Berlin", "a. d. Eigen", "an der Riß", "am Rhein", "an der Rhön", "im Schwarzwald", "an der Havel", "Freie Hansestadt", "in der Nordheide",
+			"Märkische Schweiz", "an der Altmühl", "an der Donau", "am Teutoburger Wald", "am Kaiserstuhl", "am Main", "am Neckar", "im Breisgau", "bei München", "an der Steige", "an der Brenz",
+			"an der Fils", "im Kinzigtal", "am Harz", "an der Aisch", "in Unterfranken", "an der Eger", "im Allgäu", "an der Jagst", "unter Teck", "in Bayern", "am Elm", "im Taunus",
+			"Sächsische Schweiz", "am See", "an der Isar", "in der Pfalz", "am Lech", "an der Unstrut", "an der Pegnitz", "an der Lahn", "am Inn", "an der Ruhr", "am Kocher", "am Rennweg",
+			"am Waldnaab", "am Kulm", "am Rübenberge", "an der Orla", "an der Weinstraße", "bei Coburg", "in Holstein", "in Sachsen", "am Brocken", "vor der Rhön", "an der Ilm", "am Bodensee",
+			"im Vogtland", "an der Fulda", "ob der Tauber", "am Wald", "an der Straße", "an der Murr", "an der Enz", "im Kaiserstuhl", "der Stadt", "an der Teck", "in Oberbayern", "auf Föhr",
+			"am Schaalsee", "am Harmersbach", "im Wiesental", "am Chiemsee"
+
+	));
+
 	protected ArrayList<String> tjList = new ArrayList<String>();
 
 	protected String[] startWithAbzweig = { "Abzweig" };
 
 	protected ArrayList<String> wordsBefore = new ArrayList<String>(Arrays.asList("Kreuz", "Bad", "Dreieck", "Flughafen", "Groß", "Westkreuz", "Rastplatz", "Raststätte am", "Grenzübergang", "Hann."));
-	protected ArrayList<String> wordsAfter = new ArrayList<String>(Arrays.asList("Brücke", "Ost", "Nord", "Süd", "West", "Kreuz", "(Harz)", "a. Ammersee ", "Hockenheimring", "Ei"));
+	protected ArrayList<String> wordsAfter = new ArrayList<String>(Arrays.asList("Brücke", "Ost", "Nord", "Süd", "West", "Kreuz", "(Harz)", "a. Ammersee ", "Hockenheimring", "Ei", "Südkreuz"));
 
 	public DLF_Splitter(ArrayList<String> trafficJamList) {
 		for (int i = 0; i < trafficJamList.size(); i++) {
@@ -78,43 +59,67 @@ public class DLF_Splitter {
 
 			motorway = sentenceOfTrafficJam.get(0);
 			sentenceOfTrafficJam.remove(0);
-			
+
 			for (int j = 0; j < zusaetze.size(); j++) {
-				if(zusaetze.contains(sentenceOfTrafficJam.get(0))){
+				if (zusaetze.contains(sentenceOfTrafficJam.get(0))) {
 					locStart = zusaetze.get(j);
 					sentenceOfTrafficJam.remove(0);
-				}		
+				}
 			}
-			
+
 			sentenceOfTrafficJam.contains("Richtung");
 			int indexOfRichtung = sentenceOfTrafficJam.indexOf("Richtung");
 
 			sentenceOfTrafficJam.contains("zwischen");
 			int indexOfZwischen = sentenceOfTrafficJam.indexOf("zwischen");
-			
-			
-			
-			if (indexOfRichtung == 1 && indexOfZwischen ==3) {
+
+			if (indexOfRichtung == 1 && indexOfZwischen == 3) {
 				isDefaultFinding = true;
-				
-			}else{
+
+			} else {
 				unsortedTrafficJams.add(trafficJam);
-				break;
+
 			}
 			if (isDefaultFinding) {
-				dirFrom = sentenceOfTrafficJam.get(0);
-				sentenceOfTrafficJam.remove(0);
-				sentenceOfTrafficJam.remove(0);
-				dirTo= sentenceOfTrafficJam.get(0);
-				sentenceOfTrafficJam.remove(0);
-				
-				
-				for (int j = 0; j < wordsBefore.size(); j++) {
-					if (sentenceOfTrafficJam.contains(wordsBefore.get(j))) {
+				String test = sentenceOfTrafficJam.toString();
+				dirFrom = getWord(sentenceOfTrafficJam, 0);
+				getWord(sentenceOfTrafficJam, 0);
+				dirTo = getWord(sentenceOfTrafficJam, 0);
+				getWord(sentenceOfTrafficJam, 0);
+				if (wordsBefore.contains(sentenceOfTrafficJam.get(0))) {
+					if (sentenceOfTrafficJam.get(0).equals("Flughafen") && sentenceOfTrafficJam.get(1).matches("[0-9]+")) {
 
+					} else {
+						locStart = getWord(sentenceOfTrafficJam, 0) + " ";
 					}
+
 				}
 
+				locStart = locStart + getWord(sentenceOfTrafficJam, 0);
+				if (wordsAfter.contains(sentenceOfTrafficJam.get(0))) {
+					locStart = locStart + " " + getWord(sentenceOfTrafficJam, 0);
+				}
+
+				getWord(sentenceOfTrafficJam, 0);
+
+				if (i == 65) {
+					System.out.println();
+				}
+
+				if (wordsBefore.contains(sentenceOfTrafficJam.get(0))) {
+					if (sentenceOfTrafficJam.get(0).equals("Flughafen") && sentenceOfTrafficJam.get(1).matches("[0-9]+")) {
+					} else {
+						locEnd = getWord(sentenceOfTrafficJam, 0) + " ";
+					}
+
+				}
+
+				locEnd = locEnd + getWord(sentenceOfTrafficJam, 0);
+				if (wordsAfter.contains(sentenceOfTrafficJam.get(0))) {
+					locEnd = locEnd + " " + getWord(sentenceOfTrafficJam, 0);
+				}
+
+				sentenceOfTrafficJam.get(0);
 			}
 
 			// if (trafficJam.contains(r) && trafficJam.contains(z) &&
@@ -141,6 +146,13 @@ public class DLF_Splitter {
 
 		}
 		return index;
+	}
+
+	protected String getWord(ArrayList<String> sentenceOfTrafficJam, int index) {
+
+		String tmp = sentenceOfTrafficJam.get(index);
+		sentenceOfTrafficJam.remove(index);
+		return tmp;
 	}
 
 }
