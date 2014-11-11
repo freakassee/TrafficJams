@@ -67,7 +67,10 @@ public class DLF_HTML_Cleaner {
 			item = StringManipulation.deleteIntervalString(item, "<", ">");
 
 			item = StringManipulation.deleteCharacters(item, ",");
-
+			
+			if (item.startsWith("Vorsicht auf der ")) {
+				item = item.replaceFirst("Vorsicht auf der ", "");
+			}
 			if (item.startsWith("Auf der ")) {
 				item = item.replaceFirst("Auf der ", "");
 			}
@@ -89,7 +92,16 @@ public class DLF_HTML_Cleaner {
 			if(item.contains("Rhld")){
 				item = item.replaceFirst("Rhld", "Rheinland");
 			}
-			
+			if(item.contains("und dem")){
+				item = item.replaceFirst("und dem", "und");
+			}
+			if(item.contains("wegen ")){
+				item = item.replaceFirst("wegen ", "");
+			}
+			if(item.contains("Bauarbeiten ")){
+				item = item.replaceFirst("Bauarbeiten ", "Baustelle");
+			}
+			//Bauarbeiten
 			
 			item.trim();
 			// Überprüfung, ob Nachricht mit Autobahn- (z.b. A1) bzw.

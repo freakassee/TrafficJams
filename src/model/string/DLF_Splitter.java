@@ -12,7 +12,7 @@ public class DLF_Splitter {
 	protected String r = "Richtung";
 	protected String z = "zwischen";
 	protected ArrayList<String> zusaetze = new ArrayList<String>(Arrays.asList("Bad", "Sankt", "Schwäbisch", "Ostumfahrung", "Westumfahrung", "Nordumfahrung", "Südumfahrung", "Heilbad", "Hessisch",
-			"Hohen", "Horn-Bad", "Königs", "Märkisch", "Preußisch", "Schloß", "Südliches"));
+			"Hohen", "Horn-Bad", "Königs", "Märkisch", "Preußisch", "Schloß", "Südliches", "Grenzübergang"));
 	// http://de.wikipedia.org/wiki/Liste_der_St%C3%A4dte_in_Deutschland
 	protected ArrayList<String> notUsedYet = new ArrayList<String>(Arrays.asList("Elbe", "Leine", "Lumda", "Saale", "Westerwald", "Hansestadt", "Altmark", "Harz", "Eder", "Unterweser", "Oder",
 			"Rügen", "Bergisch", "Odenwald", "Anhalt", "Donau", "Pfalz", "Lutherstadt", "Jagst", "Lausitz", "Unstrut", "Wohra", "Ostsee", "Westf.", "Schwaben", "Ems", "Bergstraße", "Werre", "Elster",
@@ -27,7 +27,15 @@ public class DLF_Splitter {
 			"Sächsische Schweiz", "am See", "an der Isar", "in der Pfalz", "am Lech", "an der Unstrut", "an der Pegnitz", "an der Lahn", "am Inn", "an der Ruhr", "am Kocher", "am Rennweg",
 			"am Waldnaab", "am Kulm", "am Rübenberge", "an der Orla", "an der Weinstraße", "bei Coburg", "in Holstein", "in Sachsen", "am Brocken", "vor der Rhön", "an der Ilm", "am Bodensee",
 			"im Vogtland", "an der Fulda", "ob der Tauber", "am Wald", "an der Straße", "an der Murr", "an der Enz", "im Kaiserstuhl", "der Stadt", "an der Teck", "in Oberbayern", "auf Föhr",
-			"am Schaalsee", "am Harmersbach", "im Wiesental", "am Chiemsee"
+			"am Schaalsee", "am Harmersbach", "im Wiesental", "am Chiemsee", "am Hockenheimring"
+
+	));
+
+	protected ArrayList<String> flows = new ArrayList<String>(Arrays.asList("stockender", "Stau", "Vollsperrung", "Richtungsfahrbahn", "gesperrt", "Sperre", "LKw-Bergungsarbeiten"
+
+	));
+
+	protected ArrayList<String> types = new ArrayList<String>(Arrays.asList("Unfall", "Baustelle", "Bergungsarbeiten", "LKW-Unfall", "Tagesbaustelle", "Nachtbaustelle"
 
 	));
 
@@ -35,7 +43,8 @@ public class DLF_Splitter {
 
 	protected String[] startWithAbzweig = { "Abzweig" };
 
-	protected ArrayList<String> wordsBefore = new ArrayList<String>(Arrays.asList("Kreuz", "Bad", "Dreieck", "Flughafen", "Groß", "Westkreuz", "Rastplatz", "Raststätte am", "Grenzübergang", "Hann."));
+	protected ArrayList<String> wordsBefore = new ArrayList<String>(Arrays.asList("Kreuz", "Bad", "Dreieck", "Flughafen", "Groß", "Westkreuz", "Rastplatz", "Raststätte am", "Grenzübergang", "Hann.",
+			"Tunnel"));
 	protected ArrayList<String> wordsAfter = new ArrayList<String>(Arrays.asList("Brücke", "Ost", "Nord", "Süd", "West", "Kreuz", "(Harz)", "a. Ammersee ", "Hockenheimring", "Ei", "Südkreuz"));
 
 	public DLF_Splitter(ArrayList<String> trafficJamList) {
@@ -102,12 +111,19 @@ public class DLF_Splitter {
 
 				getWord(sentenceOfTrafficJam, 0);
 
-				if (i == 65) {
-					System.out.println();
-				}
+//				if (i == 76) {
+//					System.out.println();
+//				}
+				boolean flug = false;
 
 				if (wordsBefore.contains(sentenceOfTrafficJam.get(0))) {
-					if (sentenceOfTrafficJam.get(0).equals("Flughafen") && sentenceOfTrafficJam.get(1).matches("[0-9]+")) {
+					if (sentenceOfTrafficJam.get(0).equals("Tunnel")) {
+						locEnd = locEnd + getWord(sentenceOfTrafficJam, 0) + " " + getWord(sentenceOfTrafficJam, 0) + " ";
+
+					} else if (sentenceOfTrafficJam.get(0).equals("Flughafen") && sentenceOfTrafficJam.get(1).matches("[0-9]+")) {
+
+						flug = true;
+
 					} else {
 						locEnd = getWord(sentenceOfTrafficJam, 0) + " ";
 					}
@@ -115,6 +131,9 @@ public class DLF_Splitter {
 				}
 
 				locEnd = locEnd + getWord(sentenceOfTrafficJam, 0);
+				if (flug) {
+					locEnd = locEnd + " " + dirFrom + "/" + dirTo;
+				}
 				if (wordsAfter.contains(sentenceOfTrafficJam.get(0))) {
 					locEnd = locEnd + " " + getWord(sentenceOfTrafficJam, 0);
 				}
@@ -122,6 +141,50 @@ public class DLF_Splitter {
 				sentenceOfTrafficJam.get(0);
 			}
 
+			// @TODO
+			// needs to adjusted for "km" in description
+			if (isDefaultFinding) {
+			if (sentenceOfTrafficJam.contains("km")) {
+				length = Integer.parseInt(sentenceOfTrafficJam.get(sentenceOfTrafficJam.indexOf("km") - 1));
+				sentenceOfTrafficJam.remove(sentenceOfTrafficJam.get(sentenceOfTrafficJam.indexOf("km") - 1));
+				sentenceOfTrafficJam.remove(sentenceOfTrafficJam.get(sentenceOfTrafficJam.indexOf("km")));
+			}
+
+			System.out.println();
+
+			for (int j = 0; j < flows.size(); j++) {
+				if (sentenceOfTrafficJam.contains(flows.get(j))) {
+					int indexOf = sentenceOfTrafficJam.indexOf(flows.get(j));
+
+					switch (j) {
+					case 0:
+						flow = sentenceOfTrafficJam.get(indexOf) + " " + sentenceOfTrafficJam.get(indexOf + 1);
+						sentenceOfTrafficJam.remove(sentenceOfTrafficJam.get(indexOf + 1));
+						sentenceOfTrafficJam.remove(sentenceOfTrafficJam.get(indexOf));
+						break;
+					default:
+						flow = sentenceOfTrafficJam.get(indexOf);
+						sentenceOfTrafficJam.remove(sentenceOfTrafficJam.get(indexOf));
+						break;
+					}
+				}
+			}
+			
+			for (int j = 0; j < types.size(); j++) {
+				if (sentenceOfTrafficJam.contains(types.get(j))) {
+					int indexOf = sentenceOfTrafficJam.indexOf(types.get(j));
+
+					switch (j) {
+					
+					default:
+						type = sentenceOfTrafficJam.get(indexOf);
+						sentenceOfTrafficJam.remove(sentenceOfTrafficJam.get(indexOf));
+						break;
+					}
+				}
+			}
+			
+			System.out.println();}
 			// if (trafficJam.contains(r) && trafficJam.contains(z) &&
 			// indexOfRichtung > 0 && indexOfRichtung < 4 && indexOfZwischen > 0
 			// && indexOfZwischen < 6) {
@@ -134,7 +197,7 @@ public class DLF_Splitter {
 
 		}
 
-		System.out.println();
+		System.out.println("ENDE");
 	}
 
 	protected int doesSentenceStartWithWords(String[] words) {

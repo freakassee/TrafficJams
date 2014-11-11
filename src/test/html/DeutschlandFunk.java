@@ -11,7 +11,7 @@ import model.string.DLF_Splitter;
 public class DeutschlandFunk {
 	public static void main(String[] args) {
 		try {
-			URL dlf_url = new URL("http://localhost:8080/examples/dlf3.htm");
+			URL dlf_url = new URL("http://localhost:8080/examples/dlf4.htm");
 		
 			ReadDocFromURL dlf_doc = new ReadDocFromURL(dlf_url);
 			
