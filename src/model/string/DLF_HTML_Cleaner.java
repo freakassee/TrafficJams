@@ -67,7 +67,7 @@ public class DLF_HTML_Cleaner {
 			item = StringManipulation.deleteIntervalString(item, "<", ">");
 
 			item = StringManipulation.deleteCharacters(item, ",");
-			
+
 			if (item.startsWith("Vorsicht auf der ")) {
 				item = item.replaceFirst("Vorsicht auf der ", "");
 			}
@@ -86,23 +86,37 @@ public class DLF_HTML_Cleaner {
 			if (item.contains("Zwischen ")) {
 				item = item.replace("Zwischen ", "zwischen ");
 			}
-			if(item.contains("St.")){
+			if (item.contains("St.")) {
 				item = item.replaceFirst("St.", "Sankt");
 			}
-			if(item.contains("Rhld")){
+			if (item.contains("Rhld")) {
 				item = item.replaceFirst("Rhld", "Rheinland");
 			}
-			if(item.contains("und dem")){
+			if (item.contains("und dem")) {
 				item = item.replaceFirst("und dem", "und");
 			}
-			if(item.contains("wegen ")){
+			if (item.contains("wegen ")) {
 				item = item.replaceFirst("wegen ", "");
 			}
-			if(item.contains("Bauarbeiten ")){
-				item = item.replaceFirst("Bauarbeiten ", "Baustelle");
+			if (item.contains("Bauarbeiten")) {
+				item = item.replaceFirst("Bauarbeiten", "Baustelle");
 			}
-			//Bauarbeiten
-			
+			if (item.contains("LKw-Bergungsarbeiten")) {
+				item = item.replaceFirst("LKw-Bergungsarbeiten", "LKW-Bergungsarbeiten");
+			}
+			if (item.contains("defekten LKW") || item.contains("defekter LKW")) {
+				item = item.replaceFirst("defekten LKW", "LKW-Defekt");
+				item = item.replaceFirst("defekter LKW", "LKW-Defekt");
+			}
+			if (item.contains("defektes Fahrzeug")) {
+				item = item.replaceFirst("defektes Fahrzeug", "Fahrzeug-Defekt");
+			}
+			if (item.endsWith(".")) {
+				item = item.substring(0, item.length() - 1);
+			}
+
+			// "LKw-Bergungsarbeiten"
+
 			item.trim();
 			// Überprüfung, ob Nachricht mit Autobahn- (z.b. A1) bzw.
 			// Bundesstraßenkennung (B51) beginnt
