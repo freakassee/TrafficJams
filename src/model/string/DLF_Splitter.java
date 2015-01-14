@@ -1,14 +1,26 @@
 package model.string;
 
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.ResultSet;
+import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Date;
 import java.util.List;
+
+import model.SQL.DatabaseTable;
 
 public class DLF_Splitter {
 
 	protected String motorway, dirFrom, dirTo, locStart, locEnd, type, flow, descr, trafficJam;
 	protected int length;
+	protected Connection c;
 	protected ArrayList<String> unsortedTrafficJams = new ArrayList<String>();
+	protected ArrayList<String> sortedTrafficJams = new ArrayList<String>();
+	protected static String tableName_FROM = "TRAFFIC_OFFEN";
+	protected static String tableName_TO = "TRAFFIC_GESCHLOSSEN";
+	protected static String dbConnection = "jdbc:postgresql://localhost:5433/trafficJams", user = "trafficAdmin", password = "trafficAdmin";
 	protected String r = "Richtung";
 	protected String z = "zwischen";
 	protected ArrayList<String> zusaetze = new ArrayList<String>(Arrays.asList("Bad", "Sankt", "Schwäbisch", "Ostumfahrung", "Westumfahrung", "Nordumfahrung", "Südumfahrung", "Heilbad", "Hessisch",
@@ -36,7 +48,7 @@ public class DLF_Splitter {
 	));
 
 	protected ArrayList<String> types = new ArrayList<String>(Arrays.asList("Unfall", "Baustelle", "Bergungsarbeiten", "LKW-Unfall", "Tagesbaustelle", "Nachtbaustelle", "Wanderbaustelle",
-			"LKw-Bergungsarbeiten", "LKW-Defekt", "Fahrzeug-Defekt"
+			"LKw-Bergungsarbeiten", "LKW-Defekt", "Fahrzeug-Defekt", "Brückenbauarbeiten"
 
 	));
 
@@ -50,178 +62,187 @@ public class DLF_Splitter {
 			Arrays.asList("Brücke", "Ost", "Nord", "Süd", "West", "Kreuz", "(Harz)", "a. Ammersee ", "Hockenheimring", "Ei", "Südkreuz", "Mitte"));
 
 	public DLF_Splitter(ArrayList<String> trafficJamList) {
+		int counter = 0;
 		for (int i = 0; i < trafficJamList.size(); i++) {
+			try {
+//				if (i == 81) {
+//					System.out.println();
+//				}
+				motorway = "";
 
-			motorway = "";
-			dirFrom = "";
-			dirTo = "";
-			locStart = "";
-			locEnd = "";
-			type = "";
-			flow = "";
-			descr = "";
-			length = 0;
+				dirFrom = "";
+				dirTo = "";
 
-			boolean isDefaultFinding = false;
-			boolean isAdvancedFinding = false;
+				locStart = "";
+				locEnd = "";
 
-			trafficJam = trafficJamList.get(i);
-			original = trafficJamList.get(i);
-			ArrayList<String> sentences = new ArrayList<String>(Arrays.asList(trafficJam.split("[.?!]")));
+				type = "";
 
-			ArrayList<String> sentenceOfTrafficJam = new ArrayList<String>(Arrays.asList(sentences.get(0).split(" ")));
+				flow = "";
 
-			// wenn erstes element leer, entferne es. geschieht wenn in dem
-			// ausgangs element mehrere sätze waren
+				descr = "";
 
-			// nur wenn der satz mit A oder B (für die Autobahnen oder
-			// Bundesstraßen) beginnt, sollen folgende operationen
-			// durchgeführt werden
+				length = 0;
 
-			motorway = sentenceOfTrafficJam.get(0);
-			sentenceOfTrafficJam.remove(0);
+				boolean isDefaultFinding = false;
+				boolean isAdvancedFinding = false;
 
-			for (int j = 0; j < zusaetze.size(); j++) {
-				if (zusaetze.contains(sentenceOfTrafficJam.get(0))) {
-					locStart = zusaetze.get(j);
-					sentenceOfTrafficJam.remove(0);
+				trafficJam = trafficJamList.get(i);
+				original = trafficJamList.get(i);
+				ArrayList<String> sentences = new ArrayList<String>(Arrays.asList(trafficJam.split("[.?!]")));
+
+				ArrayList<String> sentenceOfTrafficJam = new ArrayList<String>(Arrays.asList(sentences.get(0).split(" ")));
+
+				// wenn erstes element leer, entferne es. geschieht wenn in dem
+				// ausgangs element mehrere sätze waren
+
+				// nur wenn der satz mit A oder B (für die Autobahnen oder
+				// Bundesstraßen) beginnt, sollen folgende operationen
+				// durchgeführt werden
+
+				motorway = sentenceOfTrafficJam.get(0);
+
+				sentenceOfTrafficJam.remove(0);
+
+				int indexOfRichtung = sentenceOfTrafficJam.indexOf("Richtung");
+
+				int indexOfZwischen = sentenceOfTrafficJam.indexOf("zwischen");
+
+				if (indexOfRichtung == 1 && indexOfZwischen == 3) {
+					isDefaultFinding = true;
+
+				} else {
+					unsortedTrafficJams.add(trafficJam);
+
 				}
-			}
+				if (isDefaultFinding) {
 
-			sentenceOfTrafficJam.contains("Richtung");
-			int indexOfRichtung = sentenceOfTrafficJam.indexOf("Richtung");
+					dirFrom = dirFrom + getWord(sentenceOfTrafficJam, 0);
+					getWord(sentenceOfTrafficJam, 0);
 
-			sentenceOfTrafficJam.contains("zwischen");
-			int indexOfZwischen = sentenceOfTrafficJam.indexOf("zwischen");
+					dirTo = dirTo + getWord(sentenceOfTrafficJam, 0);
+					getWord(sentenceOfTrafficJam, 0);
 
-			if (indexOfRichtung == 1 && indexOfZwischen == 3) {
-				isDefaultFinding = true;
+					if (wordsBefore.contains(sentenceOfTrafficJam.get(0))) {
+						if (sentenceOfTrafficJam.get(0).equals("Flughafen") && sentenceOfTrafficJam.get(1).matches("[0-9]+")) {
 
-			} else {
-				unsortedTrafficJams.add(trafficJam);
+						} else {
+							locStart = getWord(sentenceOfTrafficJam, 0) + " ";
+						}
 
-			}
-			if (isDefaultFinding) {
-
-				dirFrom = getWord(sentenceOfTrafficJam, 0);
-				getWord(sentenceOfTrafficJam, 0);
-				dirTo = getWord(sentenceOfTrafficJam, 0);
-				getWord(sentenceOfTrafficJam, 0);
-				if (wordsBefore.contains(sentenceOfTrafficJam.get(0))) {
-					if (sentenceOfTrafficJam.get(0).equals("Flughafen") && sentenceOfTrafficJam.get(1).matches("[0-9]+")) {
-
-					} else {
-						locStart = getWord(sentenceOfTrafficJam, 0) + " ";
 					}
 
-				}
+					locStart = locStart + getWord(sentenceOfTrafficJam, 0);
+					if (wordsAfter.contains(sentenceOfTrafficJam.get(0))) {
+						locStart = locStart + " " + getWord(sentenceOfTrafficJam, 0);
+					}
+					// killing 'und'
+					getWord(sentenceOfTrafficJam, 0);
+//
+//					if (i == 76/* 28,57,76,80 */) {
+//						System.out.println();
+//					}
+					boolean flug = false;
 
-				locStart = locStart + getWord(sentenceOfTrafficJam, 0);
-				if (wordsAfter.contains(sentenceOfTrafficJam.get(0))) {
-					locStart = locStart + " " + getWord(sentenceOfTrafficJam, 0);
-				}
+					if (wordsBefore.contains(sentenceOfTrafficJam.get(0))) {
+						if (sentenceOfTrafficJam.get(0).equals("Tunnel")) {
+							locEnd = locEnd + getWord(sentenceOfTrafficJam, 0) + " " + getWord(sentenceOfTrafficJam, 0) + " ";
 
-				getWord(sentenceOfTrafficJam, 0);
+						} else if (sentenceOfTrafficJam.get(0).equals("Flughafen") && sentenceOfTrafficJam.get(1).matches("[0-9]+")) {
 
-				if (i == 80/* 28,57,76,80 */) {
-					System.out.println();
-				}
-				boolean flug = false;
+							flug = true;
 
-				if (wordsBefore.contains(sentenceOfTrafficJam.get(0))) {
-					if (sentenceOfTrafficJam.get(0).equals("Tunnel")) {
-						locEnd = locEnd + getWord(sentenceOfTrafficJam, 0) + " " + getWord(sentenceOfTrafficJam, 0) + " ";
+						} else {
+							locEnd = getWord(sentenceOfTrafficJam, 0) + " ";
+						}
 
-					} else if (sentenceOfTrafficJam.get(0).equals("Flughafen") && sentenceOfTrafficJam.get(1).matches("[0-9]+")) {
-
-						flug = true;
-
-					} else {
-						locEnd = getWord(sentenceOfTrafficJam, 0) + " ";
 					}
 
+					locEnd = locEnd + getWord(sentenceOfTrafficJam, 0);
+					if (flug) {
+						locEnd = locEnd + " " + dirFrom + "/" + dirTo;
+					}
+					if (wordsAfter.contains(sentenceOfTrafficJam.get(0))) {
+						locEnd = locEnd + " " + getWord(sentenceOfTrafficJam, 0);
+					}
+
+					sentenceOfTrafficJam.get(0);
 				}
 
-				locEnd = locEnd + getWord(sentenceOfTrafficJam, 0);
-				if (flug) {
-					locEnd = locEnd + " " + dirFrom + "/" + dirTo;
-				}
-				if (wordsAfter.contains(sentenceOfTrafficJam.get(0))) {
-					locEnd = locEnd + " " + getWord(sentenceOfTrafficJam, 0);
-				}
+				// @TODO
+				// needs to be adjusted for "km" in description
+				if (isDefaultFinding) {
+					if (sentenceOfTrafficJam.contains("km")) {
+						try {
 
-				sentenceOfTrafficJam.get(0);
-			}
+							length = Integer.parseInt(sentenceOfTrafficJam.get(sentenceOfTrafficJam.indexOf("km") - 1));
+							sentenceOfTrafficJam.remove(sentenceOfTrafficJam.get(sentenceOfTrafficJam.indexOf("km") - 1));
+							sentenceOfTrafficJam.remove(sentenceOfTrafficJam.get(sentenceOfTrafficJam.indexOf("km")));
+						} catch (Exception e) {
+							length = 0;
+						}
+					}
 
-			// @TODO
-			// needs to be adjusted for "km" in description
-			if (isDefaultFinding) {
-				if (sentenceOfTrafficJam.contains("km")) {
-					length = Integer.parseInt(sentenceOfTrafficJam.get(sentenceOfTrafficJam.indexOf("km") - 1));
-					sentenceOfTrafficJam.remove(sentenceOfTrafficJam.get(sentenceOfTrafficJam.indexOf("km") - 1));
-					sentenceOfTrafficJam.remove(sentenceOfTrafficJam.get(sentenceOfTrafficJam.indexOf("km")));
-				}
+					//System.out.println();
 
-				System.out.println();
+					for (int j = 0; j < flows.size(); j++) {
+						if (sentenceOfTrafficJam.contains(flows.get(j))) {
+							int indexOf = sentenceOfTrafficJam.indexOf(flows.get(j));
 
-				for (int j = 0; j < flows.size(); j++) {
-					if (sentenceOfTrafficJam.contains(flows.get(j))) {
-						int indexOf = sentenceOfTrafficJam.indexOf(flows.get(j));
-
-						switch (j) {
-						case 0:
-							flow = sentenceOfTrafficJam.get(indexOf) + " " + sentenceOfTrafficJam.get(indexOf + 1);
-							sentenceOfTrafficJam.remove(sentenceOfTrafficJam.get(indexOf + 1));
-							sentenceOfTrafficJam.remove(sentenceOfTrafficJam.get(indexOf));
-							break;
-						case 1:
-							flow = sentenceOfTrafficJam.get(indexOf) + " " + sentenceOfTrafficJam.get(indexOf + 1);
-							sentenceOfTrafficJam.remove(sentenceOfTrafficJam.get(indexOf + 1));
-							sentenceOfTrafficJam.remove(sentenceOfTrafficJam.get(indexOf));
-							break;
-						default:
-							flow = sentenceOfTrafficJam.get(indexOf);
-							sentenceOfTrafficJam.remove(sentenceOfTrafficJam.get(indexOf));
+							switch (j) {
+							case 0:
+								flow = sentenceOfTrafficJam.get(indexOf) + " " + sentenceOfTrafficJam.get(indexOf + 1);
+								sentenceOfTrafficJam.remove(sentenceOfTrafficJam.get(indexOf + 1));
+								sentenceOfTrafficJam.remove(sentenceOfTrafficJam.get(indexOf));
+								break;
+							case 1:
+								flow = sentenceOfTrafficJam.get(indexOf) + " " + sentenceOfTrafficJam.get(indexOf + 1);
+								sentenceOfTrafficJam.remove(sentenceOfTrafficJam.get(indexOf + 1));
+								sentenceOfTrafficJam.remove(sentenceOfTrafficJam.get(indexOf));
+								break;
+							default:
+								flow = sentenceOfTrafficJam.get(indexOf);
+								sentenceOfTrafficJam.remove(sentenceOfTrafficJam.get(indexOf));
+								break;
+							}
 							break;
 						}
-						break;
 					}
-				}
 
-				for (int j = 0; j < types.size(); j++) {
-					if (sentenceOfTrafficJam.contains(types.get(j))) {
-						int indexOf = sentenceOfTrafficJam.indexOf(types.get(j));
+					for (int j = 0; j < types.size(); j++) {
+						if (sentenceOfTrafficJam.contains(types.get(j))) {
+							int indexOf = sentenceOfTrafficJam.indexOf(types.get(j));
 
-						switch (j) {
+							switch (j) {
 
-						default:
-							type = sentenceOfTrafficJam.get(indexOf);
-							sentenceOfTrafficJam.remove(sentenceOfTrafficJam.get(indexOf));
+							default:
+								type = sentenceOfTrafficJam.get(indexOf);
+								sentenceOfTrafficJam.remove(sentenceOfTrafficJam.get(indexOf));
+								break;
+							}
 							break;
 						}
-						break;
 					}
+
+					sortedTrafficJams.add("'" + motorway + "','" + dirFrom + "','" + dirTo + "','" + locStart + "','" + locEnd + "','" + type + "'," + length + ",'" + flow + "'");
+					//System.out.println();
+					counter++;
 				}
-				// motorway+ " " + dirFrom + " " + "Richtung "+ dirTo +
-				// " zwischen "+ locStart+ " und "+ locEnd +" " +length
-				// +
-				// " km "+ flow + " " +type
-				System.out.println();
+
+			} catch (Exception e) {
+				System.out.println(i);
 			}
-			// if (trafficJam.contains(r) && trafficJam.contains(z) &&
-			// indexOfRichtung > 0 && indexOfRichtung < 4 &&
-			// indexOfZwischen
-			// > 0
-			// && indexOfZwischen < 6) {
-
-			// }
-
-			// } else {
-			// unsortedTrafficJams.add(trafficJam);
-			// }
-
 		}
-		System.out.println("ENDE");
+		// System.out.println("ENDE: " + counter + " von " +
+		// trafficJamList.size() + " extrahiert.");
+
+		DatabaseTable tableFROM = new DatabaseTable(dbConnection, user, password, tableName_FROM);
+		DatabaseTable tableTO = new DatabaseTable(dbConnection, user, password, tableName_TO);
+		
+		tableFROM.fillTable(sortedTrafficJams);
+		tableFROM.transferFinishedRows(tableName_FROM, tableName_TO);
+		//http://www.tutorialspoint.com/jdbc/jdbc-delete-records.htm
+
 	}
 
 	protected int doesSentenceStartWithWords(String[] words) {
@@ -230,13 +251,11 @@ public class DLF_Splitter {
 			if (trafficJam.startsWith(words[i])) {
 				return i;
 			}
-
 		}
 		return index;
 	}
 
 	protected String getWord(ArrayList<String> sentenceOfTrafficJam, int index) {
-
 		String tmp = sentenceOfTrafficJam.get(index);
 		sentenceOfTrafficJam.remove(index);
 		return tmp;

@@ -41,9 +41,12 @@ public class DLF_HTML_Cleaner {
 	}
 
 	protected void cleanItemList() {
+		
 		for (int i = 0; i < itemList.size(); i++) {
 			String item = itemList.get(i);
 			// zunächst den inhalt zwischen den ersten beiden <br> löschen
+			//String lineBreak = "<br />";
+			//	für localhost: 
 			String lineBreak = "<br>";
 
 			if (item.contains(lineBreak)) {
@@ -95,8 +98,8 @@ public class DLF_HTML_Cleaner {
 			if (item.contains("und dem")) {
 				item = item.replaceFirst("und dem", "und");
 			}
-			if (item.contains("wegen ")) {
-				item = item.replaceFirst("wegen ", "");
+			if (item.contains(" wegen ")) {
+				item = item.replaceFirst(" wegen ", " ");
 			}
 			if (item.contains("Bauarbeiten")) {
 				item = item.replaceFirst("Bauarbeiten", "Baustelle");
@@ -110,6 +113,12 @@ public class DLF_HTML_Cleaner {
 			}
 			if (item.contains("defektes Fahrzeug")) {
 				item = item.replaceFirst("defektes Fahrzeug", "Fahrzeug-Defekt");
+			}
+			if (item.contains("(")) {
+				item = item.replace("(", "");
+			}
+			if (item.contains(")")) {
+				item = item.replace(")", "");
 			}
 			if (item.endsWith(".")) {
 				item = item.substring(0, item.length() - 1);

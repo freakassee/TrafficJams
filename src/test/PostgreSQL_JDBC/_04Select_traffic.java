@@ -11,7 +11,7 @@ public class _04Select_traffic {
 		Statement stmt = null;
 		try {
 			Class.forName("org.postgresql.Driver");
-			c = DriverManager.getConnection("jjdbc:postgresql://localhost:5432/traffic_first", "traffic", "traffic");
+			c = DriverManager.getConnection("jdbc:postgresql://localhost:5433/trafficJams", "trafficAdmin", "trafficAdmin");
 			c.setAutoCommit(false);
 			System.out.println("Opened database successfully");
 

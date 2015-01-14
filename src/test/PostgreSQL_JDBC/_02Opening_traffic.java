@@ -8,7 +8,7 @@ public class _02Opening_traffic {
 		Connection c = null;
 		try {
 			Class.forName("org.postgresql.Driver");
-			c = DriverManager.getConnection("jdbc:postgresql://localhost:5432/traffic_first", "traffic", "traffic");
+			c = DriverManager.getConnection("jdbc:postgresql://localhost:5433/trafficJams", "trafficAdmin", "trafficAdmin");
 		} catch (Exception e) {
 			e.printStackTrace();
 			System.err.println(e.getClass().getName() + ": " + e.getMessage());

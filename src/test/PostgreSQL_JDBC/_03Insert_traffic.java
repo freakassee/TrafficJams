@@ -10,28 +10,25 @@ public class _03Insert_traffic {
 		Statement stmt = null;
 		try {
 			Class.forName("org.postgresql.Driver");
-			c = DriverManager.getConnection("jdbc:postgresql://localhost:5432/traffic_first", "traffic", "traffic");
+			c = DriverManager.getConnection("jdbc:postgresql://localhost:5433/trafficJams", "trafficAdmin", "trafficAdmin");
 			c.setAutoCommit(false);
 			System.out.println("Opened database successfully");
 
 			/*
-			 * "(ID 				INT 	PRIMARY KEY 	NOT NULL," 
-				+ " MOTORWAY 		CHAR(5)					NOT NULL,"
-				+ " DIRECTION 		TEXT 					NOT NULL,"
-				+ " START_LOCATION	TEXT    				NOT NULL,"
-				+ " END_LOCATION	TEXT    				NOT NULL," 
-				+ " TYPE 			TEXT    						,"
-				+ " LENGTH     		TEXT					NOT NULL," 
-				+ " FLOW      		TEXT								)";
-			 * 
-			 * */
-			
+			 * "(ID 				INT 	PRIMARY KEY 	NOT NULL," +
+			 * " MOTORWAY 		CHAR(5)					NOT NULL," +
+			 * " DIRECTION 		TEXT 					NOT NULL," +
+			 * " START_LOCATION	TEXT    				NOT NULL," +
+			 * " END_LOCATION	TEXT    				NOT NULL," +
+			 * " TYPE 			TEXT    						," + " LENGTH     		TEXT					NOT NULL," +
+			 * " FLOW      		TEXT								)";
+			 */
+
 			stmt = c.createStatement();
-			String sql = "INSERT INTO TRAFFIC (" +
-						"ID							,MOTORWAY	,DIRECTION					,START_LOCATION	,END_LOCATION	,TYPE	,LENGTH	,FLOW					) " + 
-			"VALUES ("+	System.currentTimeMillis()+", 'A1'		, 'Dortmund Richtung Münster',	'Dortmund'	,'Münster'		,	''	,'3km'	,'stockender Verkehr'	);";
+			String sql = "INSERT INTO TRAFFIC ("
+					+ "ID,							MOTORWAY,DIR_FROM	,DIR_TO		,LOC_START	,LOC_END	,TYPE		,LENGTH	,FLOW					) " + 
+			"VALUES (" + System.currentTimeMillis()+", 'A1'	,'Dortmund'	,'Münster'	,'Dortmund'	,'Münster'	,'Baustelle','3km'	,'stockender Verkehr'	);";
 			stmt.executeUpdate(sql);
-			
 
 			stmt.close();
 			c.commit();
