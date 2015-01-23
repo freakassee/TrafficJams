@@ -8,7 +8,7 @@ public class DLF_HTML_Cleaner {
 	String searchTermStart = "<p><strong class=\"arial_headline\"><b name=\"highway\">";
 	String searchTermEnd = "<p>Alle Angaben ohne Gewähr.</p>";
 
-	public DLF_HTML_Cleaner(String htmlDoc) {
+	public DLF_HTML_Cleaner(String htmlDoc,boolean isLocalhost) {
 
 		if (htmlDoc.contains(searchTermStart)) {
 			htmlDoc = htmlDoc.substring(htmlDoc.indexOf(searchTermStart));
@@ -35,19 +35,27 @@ public class DLF_HTML_Cleaner {
 
 			}
 
-			cleanItemList();
+			cleanItemList(isLocalhost);
 
 		}
 	}
 
-	protected void cleanItemList() {
+	protected void cleanItemList(boolean isLocalhost) {
 		
 		for (int i = 0; i < itemList.size(); i++) {
 			String item = itemList.get(i);
-			// zunächst den inhalt zwischen den ersten beiden <br> löschen
-			//String lineBreak = "<br />";
-			//	für localhost: 
-			String lineBreak = "<br>";
+			String lineBreak;
+			if(isLocalhost){
+				
+				//	für localhost: 
+				lineBreak = "<br>";
+				
+			}else{
+				// zunächst den inhalt zwischen den ersten beiden <br> löschen
+				// für http://www.deutschlandradio.de/verkehrsmeldungen.438.de.html 
+				lineBreak = "<br />";
+			}
+			
 
 			if (item.contains(lineBreak)) {
 				int indexAnfang = item.indexOf(lineBreak);
