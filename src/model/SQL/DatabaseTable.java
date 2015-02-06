@@ -38,7 +38,7 @@ public class DatabaseTable {
 			return true;
 
 		} catch (Exception e) {
-			System.out.println("Does not exist");
+			System.out.println("Table: " + tableName + " does not exist");
 			return false;
 		}
 
@@ -51,8 +51,8 @@ public class DatabaseTable {
 				Connection c = DriverManager.getConnection(dbConnection, user, password);
 				c.setAutoCommit(false);
 				Statement createStatement = c.createStatement();
-				String sqlQuery = "CREATE TABLE " + tableName + " (ID SERIAL PRIMARY KEY NOT NULL, MOTORWAY CHAR(5) NOT NULL, DIR_FROM TEXT NOT NULL, DIR_TO TEXT NOT NULL, LOC_START TEXT NOT NULL,"
-						+ "LOC_END TEXT NOT NULL, TYPE TEXT, LENGTH BIGINT NOT NULL, FLOW TEXT, DATE_STARTED	BIGINT, DATE_ENDED BIGINT, UPDATED BOOLEAN);";
+				String sqlQuery = "CREATE TABLE " + tableName + " (ID SERIAL PRIMARY KEY NOT NULL, MOTORWAY CHAR(5) NOT NULL, DIR_FROM TEXT , DIR_TO TEXT , LOC_START TEXT ,"
+						+ "LOC_END TEXT , TYPE TEXT, LENGTH BIGINT , FLOW TEXT, DATE_STARTED	BIGINT, DATE_ENDED BIGINT, UPDATED BOOLEAN);";
 				createStatement.executeUpdate(sqlQuery);
 				createStatement.close();
 				c.commit();
@@ -81,30 +81,27 @@ public class DatabaseTable {
 						+ "AND type=" + exp[5] + "AND length=" + exp[6] + "AND flow =" + exp[7] + ";";
 				ResultSet rs = rsStmt.executeQuery(sql);
 
-				// System.out.println();
 				boolean doesExist = rs.next();
 
-				// ResultSet rs = stmt.executeQuery(selectQuerySQL);
 				if (doesExist) {
 
 					int id = rs.getInt("id");
-					String name = rs.getString("MOTORWAY");
-					String dirF = rs.getString("DIR_FROM");
-					String dirT = rs.getString("DIR_TO");
+					// String name = rs.getString("MOTORWAY");
+					// String dirF = rs.getString("DIR_FROM");
+					// String dirT = rs.getString("DIR_TO");
 
-					System.out.println("ID = " + id);
-					System.out.println("motorway = " + name);
-					System.out.println("dirF = " + dirF);
-					System.out.println("dirT = " + dirT);
+					// System.out.println("ID = " + id);
+					// System.out.println("motorway = " + name);
+					// System.out.println("dirF = " + dirF);
+					// System.out.println("dirT = " + dirT);
+					// System.out.println("Updated id: " + id);
+
 					setUpdatedTo(id);
-
 				} else {
 
-					String sql2 = "INSERT INTO " + tableName + " (MOTORWAY,"
-					// + "INDI,"
-							+ "DIR_FROM," + "DIR_TO," + "LOC_START," + "LOC_END," + "TYPE," + "LENGTH," + "FLOW," + "DATE_STARTED," + "UPDATED" + ")" + "VALUES (" + exp[0] + ", "
-							// + "'"+i+"'"+","
-							+ exp[1] + "," + exp[2] + "," + exp[3] + "," + exp[4] + "," + exp[5] + "," + exp[6] + "," + exp[7] + ", " + System.currentTimeMillis() + "," + true + ");";
+					String sql2 = "INSERT INTO " + tableName + " (MOTORWAY," + "DIR_FROM," + "DIR_TO," + "LOC_START," + "LOC_END," + "TYPE," + "LENGTH," + "FLOW," + "DATE_STARTED," + "UPDATED" + ")"
+							+ "VALUES (" + exp[0] + ", " + exp[1] + "," + exp[2] + "," + exp[3] + "," + exp[4] + "," + exp[5] + "," + exp[6] + "," + exp[7] + ", " + System.currentTimeMillis() + ","
+							+ true + ");";
 
 					Statement sqlStmt = c.createStatement();
 					sqlStmt.executeUpdate(sql2);
@@ -116,6 +113,47 @@ public class DatabaseTable {
 				c.close();
 			}
 
+		} catch (Exception e) {
+			System.out.println("Error in fillTable: " + e.getClass().getName() + ": " + e.getMessage());
+
+		}
+
+	}
+
+	public void fillNotTable(String unidentified) {
+
+		setUpdatedTo(0);
+		try {
+
+			Connection c = DriverManager.getConnection(dbConnection, user, password);
+			c.setAutoCommit(false);
+			Statement rsStmt = c.createStatement();
+
+			String sql = "SELECT * FROM " + tableName + " WHERE dir_from = '" + unidentified + "';";
+			ResultSet rs = rsStmt.executeQuery(sql);
+
+			boolean doesExist = rs.next();
+
+			if (doesExist) {
+
+				int id = rs.getInt("id");
+				
+
+				setUpdatedTo(id);
+				
+			} else {
+
+				String sql2 = "INSERT INTO " + tableName + " (MOTORWAY,DIR_FROM,DATE_STARTED)" + "VALUES ('WRONG','" + unidentified + "', " + System.currentTimeMillis() + ");";
+
+				Statement sqlStmt = c.createStatement();
+				sqlStmt.executeUpdate(sql2);
+				sqlStmt.close();
+				c.commit();
+
+				rsStmt.close();
+				c.close();
+
+			}
 		} catch (Exception e) {
 			System.out.println("Error in fillTable: " + e.getClass().getName() + ": " + e.getMessage());
 
@@ -144,7 +182,7 @@ public class DatabaseTable {
 				int LENGTH = rs.getInt("LENGTH");
 				String FLOW = "'" + rs.getString("FLOW") + "'";
 				long DATE_STARTED = rs.getLong("DATE_STARTED");
-			
+
 				String sql2 = "INSERT INTO " + toTable + " (MOTORWAY," + "DIR_FROM," + "DIR_TO," + "LOC_START," + "LOC_END," + "TYPE," + "LENGTH," + "FLOW," + "DATE_STARTED," + "DATE_ENDED" + ")"
 						+ "VALUES (" + MOTORWAY + "," + DIR_FROM + "," + DIR_TO + "," + LOC_START + "," + LOC_END + "," + TYPE + "," + LENGTH + ", " + FLOW + "," + DATE_STARTED + ","
 						+ System.currentTimeMillis() + ");";
@@ -153,7 +191,6 @@ public class DatabaseTable {
 				String sql3 = "DELETE FROM " + tableName + " WHERE ID =" + id;
 				stmt.execute(sql3);
 				c.commit();
-				
 
 			}
 			rs.close();
@@ -165,17 +202,15 @@ public class DatabaseTable {
 
 	}
 
-	
-
 	private void setUpdatedTo(int id) {
 		boolean valueForUpdated;
-		
+
 		String whereClause = "";
 
 		if (id == 0) {
 			valueForUpdated = false;
 		} else {
-			
+
 			valueForUpdated = true;
 			whereClause = " WHERE ID = " + id + " ";
 		}

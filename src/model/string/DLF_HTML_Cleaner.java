@@ -78,7 +78,10 @@ public class DLF_HTML_Cleaner {
 			item = StringManipulation.deleteIntervalString(item, "<", ">");
 
 			item = StringManipulation.deleteCharacters(item, ",");
-
+			if (item.contains("bitte ")) {
+				item = item.replaceFirst("bitte ", "");
+			}
+			
 			if (item.startsWith("Vorsicht auf der ")) {
 				item = item.replaceFirst("Vorsicht auf der ", "");
 			}
@@ -114,6 +117,9 @@ public class DLF_HTML_Cleaner {
 			}
 			if (item.contains("LKw-Bergungsarbeiten")) {
 				item = item.replaceFirst("LKw-Bergungsarbeiten", "LKW-Bergungsarbeiten");
+			}
+			if (item.contains("von der ")) {
+				item = item.replaceFirst("von der ", "");
 			}
 			if (item.contains("defekten LKW") || item.contains("defekter LKW")) {
 				item = item.replaceFirst("defekten LKW", "LKW-Defekt");

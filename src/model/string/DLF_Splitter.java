@@ -23,6 +23,7 @@ public class DLF_Splitter {
 	protected static String dbConnection = "jdbc:postgresql://localhost:5433/trafficJams", user = "trafficAdmin", password = "trafficAdmin";
 	protected String r = "Richtung";
 	protected String z = "zwischen";
+	protected boolean tmpBoolean = false;
 	protected ArrayList<String> zusaetze = new ArrayList<String>(Arrays.asList("Bad", "Sankt", "Schwäbisch", "Ostumfahrung", "Westumfahrung", "Nordumfahrung", "Südumfahrung", "Heilbad", "Hessisch",
 			"Hohen", "Horn-Bad", "Königs", "Märkisch", "Preußisch", "Schloß", "Südliches", "Grenzübergang"));
 	// http://de.wikipedia.org/wiki/Liste_der_St%C3%A4dte_in_Deutschland
@@ -48,7 +49,7 @@ public class DLF_Splitter {
 	));
 
 	protected ArrayList<String> types = new ArrayList<String>(Arrays.asList("Unfall", "Baustelle", "Bergungsarbeiten", "LKW-Unfall", "Tagesbaustelle", "Nachtbaustelle", "Wanderbaustelle",
-			"LKw-Bergungsarbeiten", "LKW-Defekt", "Fahrzeug-Defekt", "Brückenbauarbeiten"
+			"LKw-Bergungsarbeiten", "LKW-Defekt", "Fahrzeug-Defekt", "Brückenbauarbeiten", "Wartungsarbeiten"
 
 	));
 
@@ -57,40 +58,32 @@ public class DLF_Splitter {
 	protected String[] startWithAbzweig = { "Abzweig" };
 	String original = "";
 	protected ArrayList<String> wordsBefore = new ArrayList<String>(Arrays.asList("Kreuz", "Bad", "Dreieck", "Flughafen", "Groß", "Westkreuz", "Rastplatz", "Raststätte am", "Grenzübergang", "Hann.",
-			"Tunnel"));
-	protected ArrayList<String> wordsAfter = new ArrayList<String>(
-			Arrays.asList("Brücke", "Ost", "Nord", "Süd", "West", "Kreuz", "(Harz)", "a. Ammersee ", "Hockenheimring", "Ei", "Südkreuz", "Mitte"));
+			"Tunnel", "Ausfahrt", "Auffahrt", "Anschlussstelle"));
+	protected ArrayList<String> wordsAfter = new ArrayList<String>(Arrays.asList("Brücke", "Ost", "Nord", "Süd", "West", "Kreuz", "(Harz)", "a. Ammersee ", "Hockenheimring", "Ei", "Südkreuz",
+			"Mitte", "Berge"));
 
 	public DLF_Splitter(ArrayList<String> trafficJamList) {
 		int counter = 0;
+		int UNIDcounter = 0;
 		for (int i = 0; i < trafficJamList.size(); i++) {
 			try {
-//				if (i == 81) {
-//					System.out.println();
-//				}
-				motorway = "";
 
+				motorway = "";
 				dirFrom = "";
 				dirTo = "";
-
 				locStart = "";
 				locEnd = "";
-
 				type = "";
-
 				flow = "";
-
 				descr = "";
-
 				length = 0;
-
 				boolean isDefaultFinding = false;
-				boolean isAdvancedFinding = false;
+				// boolean isAdvancedFinding = false;
 
 				trafficJam = trafficJamList.get(i);
 				original = trafficJamList.get(i);
-				ArrayList<String> sentences = new ArrayList<String>(Arrays.asList(trafficJam.split("[.?!]")));
-
+				
+				ArrayList<String> sentences = new ArrayList<String>(Arrays.asList(trafficJam.split("[?!]")));
 				ArrayList<String> sentenceOfTrafficJam = new ArrayList<String>(Arrays.asList(sentences.get(0).split(" ")));
 
 				// wenn erstes element leer, entferne es. geschieht wenn in dem
@@ -99,29 +92,47 @@ public class DLF_Splitter {
 				// nur wenn der satz mit A oder B (für die Autobahnen oder
 				// Bundesstraßen) beginnt, sollen folgende operationen
 				// durchgeführt werden
-
+			
+				
 				motorway = sentenceOfTrafficJam.get(0);
-
 				sentenceOfTrafficJam.remove(0);
 
-				int indexOfRichtung = sentenceOfTrafficJam.indexOf("Richtung");
+				boolean withRichtung = false;
+				boolean withZwischen = false;
 
-				int indexOfZwischen = sentenceOfTrafficJam.indexOf("zwischen");
+				dirFrom = testingMethod("Richtung", sentenceOfTrafficJam);
+				withRichtung = this.tmpBoolean;
 
-				if (indexOfRichtung == 1 && indexOfZwischen == 3) {
-					isDefaultFinding = true;
+				dirTo = testingMethod("zwischen", sentenceOfTrafficJam);
+				withZwischen = this.tmpBoolean;
 
-				} else {
-					unsortedTrafficJams.add(trafficJam);
-
+				if (!withRichtung && !withZwischen) {
+					System.out.println("PROBLEM");
 				}
-				if (isDefaultFinding) {
 
-					dirFrom = dirFrom + getWord(sentenceOfTrafficJam, 0);
-					getWord(sentenceOfTrafficJam, 0);
+				if (withRichtung||(!withRichtung&&withZwischen)) {
 
-					dirTo = dirTo + getWord(sentenceOfTrafficJam, 0);
-					getWord(sentenceOfTrafficJam, 0);
+					if (!withZwischen) {
+						dirTo = testingMethod("ist", sentenceOfTrafficJam);
+
+						if (tmpBoolean) {
+							getWord(sentenceOfTrafficJam, 0);
+						} else {
+							dirTo = testingMethod("bleibt", sentenceOfTrafficJam);
+							if (tmpBoolean) {
+								getWord(sentenceOfTrafficJam, 0);
+							} else {
+								dirTo = testingMethod("Tunnel", sentenceOfTrafficJam);
+								if (tmpBoolean) {
+									// getWord(sentenceOfTrafficJam, 0);
+								}
+							}
+						}
+					}
+					
+					if(!withRichtung&&withZwischen){
+						dirFrom=dirTo;
+					}
 
 					if (wordsBefore.contains(sentenceOfTrafficJam.get(0))) {
 						if (sentenceOfTrafficJam.get(0).equals("Flughafen") && sentenceOfTrafficJam.get(1).matches("[0-9]+")) {
@@ -137,14 +148,12 @@ public class DLF_Splitter {
 						locStart = locStart + " " + getWord(sentenceOfTrafficJam, 0);
 					}
 					// killing 'und'
-					getWord(sentenceOfTrafficJam, 0);
-//
-//					if (i == 76/* 28,57,76,80 */) {
-//						System.out.println();
-//					}
-					boolean flug = false;
+					if (withZwischen) {
+						getWord(sentenceOfTrafficJam, 0);
+					}
 
-					if (wordsBefore.contains(sentenceOfTrafficJam.get(0))) {
+					boolean flug = false;
+					 if (wordsBefore.contains(sentenceOfTrafficJam.get(0))) {
 						if (sentenceOfTrafficJam.get(0).equals("Tunnel")) {
 							locEnd = locEnd + getWord(sentenceOfTrafficJam, 0) + " " + getWord(sentenceOfTrafficJam, 0) + " ";
 
@@ -158,20 +167,21 @@ public class DLF_Splitter {
 
 					}
 
-					locEnd = locEnd + getWord(sentenceOfTrafficJam, 0);
+					 if (tmpBoolean&&withRichtung) {
+							locEnd = locStart;
+						} else{
+							locEnd = locEnd + getWord(sentenceOfTrafficJam, 0);
+							
 					if (flug) {
 						locEnd = locEnd + " " + dirFrom + "/" + dirTo;
 					}
 					if (wordsAfter.contains(sentenceOfTrafficJam.get(0))) {
 						locEnd = locEnd + " " + getWord(sentenceOfTrafficJam, 0);
 					}
+						}
 
-					sentenceOfTrafficJam.get(0);
-				}
+					// sentenceOfTrafficJam.get(0);
 
-				// @TODO
-				// needs to be adjusted for "km" in description
-				if (isDefaultFinding) {
 					if (sentenceOfTrafficJam.contains("km")) {
 						try {
 
@@ -182,8 +192,6 @@ public class DLF_Splitter {
 							length = 0;
 						}
 					}
-
-					//System.out.println();
 
 					for (int j = 0; j < flows.size(); j++) {
 						if (sentenceOfTrafficJam.contains(flows.get(j))) {
@@ -223,26 +231,70 @@ public class DLF_Splitter {
 							break;
 						}
 					}
-
 					sortedTrafficJams.add("'" + motorway + "','" + dirFrom + "','" + dirTo + "','" + locStart + "','" + locEnd + "','" + type + "'," + length + ",'" + flow + "'");
-					//System.out.println();
 					counter++;
+				}else{
+					
+					System.out.println("crazy s*#t " + i);
+					DatabaseTable xyz = new DatabaseTable(dbConnection, user, password, "NOT_IDENDIFIABLE");
+					xyz.fillNotTable(trafficJamList.get(i));
+					System.out.println("Zeile: " + i + " in " +  " NOT_IDENDIFIABLE Table gespeichert.");
 				}
+				
 
 			} catch (Exception e) {
 				System.out.println(i);
 			}
 		}
-		// System.out.println("ENDE: " + counter + " von " +
-		// trafficJamList.size() + " extrahiert.");
+		System.out.println("ENDE: " + counter + " von " + trafficJamList.size() + " extrahiert.");
 
 		DatabaseTable tableFROM = new DatabaseTable(dbConnection, user, password, tableName_FROM);
 		DatabaseTable tableTO = new DatabaseTable(dbConnection, user, password, tableName_TO);
-		
+
 		tableFROM.fillTable(sortedTrafficJams);
 		tableFROM.transferFinishedRows(tableName_FROM, tableName_TO);
-		//http://www.tutorialspoint.com/jdbc/jdbc-delete-records.htm
+//		
+		
+		
+		// http://www.tutorialspoint.com/jdbc/jdbc-delete-records.htm
 
+	}
+
+	private String testingMethod(String word, ArrayList<String> sentenceOfTrafficJam) {
+		setTmpBoolean(false);
+		String str = "";
+		int indexOfWord = sentenceOfTrafficJam.indexOf(word);
+		if (indexOfWord > -1 && indexOfWord <= 5) {
+			setTmpBoolean(true);
+
+			int j = indexOfWord;
+			while (j > 1) {
+				str = str + getWord(sentenceOfTrafficJam, 0) + " ";
+				j--;
+			}
+			str = str + getWord(sentenceOfTrafficJam, 0);
+			if (!word.equals("Tunnel")) {
+				getWord(sentenceOfTrafficJam, 0);
+			}
+
+		}
+		return str;
+
+	}
+
+	/**
+	 * @return the tmpBoolean
+	 */
+	public boolean isTmpBoolean() {
+		return tmpBoolean;
+	}
+
+	/**
+	 * @param tmpBoolean
+	 *            the tmpBoolean to set
+	 */
+	public void setTmpBoolean(boolean tmpBoolean) {
+		this.tmpBoolean = tmpBoolean;
 	}
 
 	protected int doesSentenceStartWithWords(String[] words) {
